@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
+    tools:context="com.itnstudios.customtimer.MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00"
+        android:id="@+id/tv_clock"
+        android:textSize="50dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start"
+        android:id="@+id/btn_start"
+        android:onClick="startClock"
+        android:layout_alignTop="@+id/btn_stop"
+        android:layout_toRightOf="@+id/tv_clock"
+        android:layout_toEndOf="@+id/tv_clock" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pause"
+        android:id="@+id/btn_pause"
+        android:onClick="pauseClock"
+        android:layout_alignTop="@+id/btn_stop"
+        android:layout_toRightOf="@+id/tv_clock"
+        android:layout_toEndOf="@+id/tv_clock"
+        android:visibility="gone"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Resume"
+        android:id="@+id/btn_resume"
+        android:onClick="resumeClock"
+        android:layout_alignTop="@+id/btn_stop"
+        android:layout_toRightOf="@+id/tv_clock"
+        android:layout_toEndOf="@+id/tv_clock"
+        android:visibility="gone"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop"
+        android:id="@+id/btn_stop"
+        android:onClick="stopClock"
+        android:layout_below="@+id/tv_clock"
+        android:layout_toLeftOf="@+id/tv_clock"
+        android:layout_toStartOf="@+id/tv_clock"
+        android:layout_marginTop="45dp" />
+</RelativeLayout>
