@@ -1,4 +1,4 @@
-package CustomTimer;
+package com.itnstudios.drafthero;
 
 import android.app.Activity;
 
@@ -8,32 +8,32 @@ import android.app.Activity;
 public class CustomTimer extends Thread {
 
     public interface TimerListener{
-        public void newLap(int lapNumber);
+        public void onNewLap(int lapNumber);
         public void onTick(long timeRemainingMillis);
     }
 
     private TimerListener listener;
     private Activity activity;
 
-    private long timerStartMillis;
     private long timeRemainingMillis;
     private long lapLengthMillis;
     private int  lapNumber;
     private long previousTickMillis;
     private long tickLength;
     private long timePaused;
+    private long stopTimeInFuture;
 
     private boolean clockRunning;
-    private boolean clockBegan;
+    private boolean clockAlreadyStarted;
 
     public CustomTimer(Activity activity) {
         super();
         this.activity = activity;
         lapLengthMillis = 0;
-        timerStartMillis = 0;
         lapNumber = 0;
         timeRemainingMillis = 0;
         previousTickMillis = 0;
+        tickLength = 1000;
     }
 
     public void setListener(TimerListener listener){
@@ -48,10 +48,10 @@ public class CustomTimer extends Thread {
     public void run() {
         super.run();
         while(true) {
-            while (clockBegan) {
+            while (clockAlreadyStarted) {
                 if (clockRunning) {
                     long currentTime = System.currentTimeMillis();
-                    timeRemainingMillis = (timerStartMillis + lapLengthMillis * (lapNumber + 1)) - currentTime;
+                    timeRemainingMillis = stopTimeInFuture - currentTime;
 
                     if (currentTime - previousTickMillis >= tickLength) {
                         previousTickMillis = currentTime;
@@ -65,17 +65,22 @@ public class CustomTimer extends Thread {
                     }
                     if (timeRemainingMillis < 0) {
                         lapNumber++;
-                        timeRemainingMillis = System.currentTimeMillis();
+                        stopTimeInFuture = (currentTime + lapLengthMillis);
                         activity.runOnUiThread(new Runnable() {
 
                             @Override
                             public void run() {
-                                listener.newLap(lapNumber);
+                                listener.onNewLap(lapNumber);
                             }
                         });
                         //Log.d("New lap happening", ""+lapNumber);
                     }
                 }
+            }
+            try {
+                this.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -89,7 +94,7 @@ public class CustomTimer extends Thread {
     }
 
     public void stopClock() {
-        clockBegan = false;
+        clockAlreadyStarted = false;
         clockRunning = false;
     }
     public void pauseClock(){
@@ -98,12 +103,12 @@ public class CustomTimer extends Thread {
     }
 
     public void startClock(){
-        if(!clockBegan) {
-            timerStartMillis = System.currentTimeMillis();
-            previousTickMillis = timerStartMillis;
+        if(!clockAlreadyStarted) {
+            previousTickMillis = System.currentTimeMillis();;
             lapNumber = 0;
+            stopTimeInFuture = previousTickMillis + lapLengthMillis;
             clockRunning = true;
-            clockBegan = true;
+            clockAlreadyStarted = true;
             if(State.NEW == this.getState())
                 super.start();
         }else{
@@ -111,9 +116,11 @@ public class CustomTimer extends Thread {
         }
     }
 
+    // Offset the time lap is completed by the amount of time clock was paused
     public  void resumeClock(){
         clockRunning = true;
-        timerStartMillis += (System.currentTimeMillis() - timePaused);
+        stopTimeInFuture += System.currentTimeMillis() - timePaused;
     }
+
 
 }
